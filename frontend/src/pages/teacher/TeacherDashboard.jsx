@@ -6,7 +6,9 @@ import { ClassHealthCard } from "../../components/common/HealthScore";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "../../components/ui/Card";
 import { Badge, RiskBadge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
-import { classrooms, students, assignments, notifications, todaySchedule, teachers, subjects } from "../../data/mockData";
+import { useState, useEffect } from "react";
+import { api } from "../../services/api";
+import { classrooms as mockClassrooms, students as mockStudents, assignments as mockAssignments, notifications, todaySchedule, teachers, subjects } from "../../data/mockData";
 import { calculateRiskScore } from "../../utils/riskScore";
 import {
   Users, ClipboardList, BookCheck, AlertTriangle, Clock,
@@ -20,32 +22,58 @@ const fadeIn = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } }
 export default function TeacherDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [dbStats, setDbStats] = useState(null);
+  const [dbAssignments, setDbAssignments] = useState([]);
+
+  useEffect(() => {
+    if (user?.id) {
+      api.dashboard.getTeacherStats(user.id).then(setDbStats).catch(console.error);
+      api.assignments.getAll("", user.id).then(setDbAssignments).catch(console.error);
+    }
+  }, [user]);
 
   // Get teacher's classes
   const teacher = teachers.find((t) => t.id === user?.id) || teachers[0];
-  const myClasses = classrooms.filter((c) => teacher.classes.includes(c.id));
+  const myAssignments = dbAssignments.length > 0
+    ? dbAssignments
+    : mockAssignments.filter((a) => teacher.subjects.includes(a.subject));
+  const myClasses = dbStats
+    ? dbStats.classes.map((c) => ({
+        ...c,
+        // Map keys if needed or keep backend keys
+        strength: c.strength,
+        healthScore: c.healthScore,
+        attendance: c.attendance,
+      }))
+    : mockClassrooms.filter((c) => teacher.classes.includes(c.id));
 
-  // Get at-risk students in teacher's classes
-  const myStudents = students.filter((s) => teacher.classes.includes(s.classroom));
-  const riskStudents = myStudents.map((s) => ({
-    ...s,
-    risk: calculateRiskScore(s),
-  })).filter((s) => s.risk.level !== "low").sort((a, b) => b.risk.score - a.risk.score);
+  // Get at-risk students
+  const riskStudents = dbStats
+    ? dbStats.riskStudents
+    : mockStudents
+        .filter((s) => teacher.classes.includes(s.classroom))
+        .map((s) => ({ ...s, risk: calculateRiskScore(s) }))
+        .filter((s) => s.risk.level !== "low")
+        .sort((a, b) => b.risk.score - a.risk.score);
 
-  // Pending evaluations (assignments needing marking)
-  const myAssignments = assignments.filter((a) => teacher.subjects.includes(a.subject));
-  const pendingEvals = myAssignments.reduce((sum, a) => sum + Math.round(a.submissionRate * 0.6), 0);
+  // Pending evaluations
+  const pendingEvals = dbStats
+    ? dbStats.pendingEvaluations
+    : mockAssignments
+        .filter((a) => teacher.subjects.includes(a.subject))
+        .reduce((sum, a) => sum + Math.round(a.submissionRate * 0.6), 0);
 
   // Today's schedule
-  const today = "Monday";
-  const todaySlots = todaySchedule["cls-1"] || [];
+  const todaySlots = dbStats
+    ? dbStats.todaySchedule
+    : (todaySchedule["cls-1"] || []);
 
   // Performance data for chart
   const perfData = myClasses.map((c) => ({
     name: c.name,
     health: c.healthScore,
     attendance: c.attendance,
-    performance: c.academicPerformance,
+    performance: c.academicPerformance || 78,
   }));
 
   const unreadCount = notifications.teacher.filter((n) => !n.read).length;

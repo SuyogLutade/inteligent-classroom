@@ -13,12 +13,27 @@ import ComingSoon from "./pages/shared/ComingSoon";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import ClassManagement from "./pages/admin/ClassManagement";
+import ClassDetail from "./pages/admin/ClassDetail";
+import StudentManagement from "./pages/admin/StudentManagement";
+import FacultyManagement from "./pages/admin/FacultyManagement";
+import RoomManagement from "./pages/admin/RoomManagement";
+import TimetableManagement from "./pages/admin/TimetableManagement";
 
 // Teacher pages
 import TeacherDashboard from "./pages/teacher/TeacherDashboard";
+import ClassesPage from "./pages/teacher/ClassesPage";
+import AttendancePage from "./pages/teacher/AttendancePage";
+import AssignmentsPage from "./pages/teacher/AssignmentsPage";
+import PerformancePage from "./pages/teacher/PerformancePage";
+import StudentRiskPage from "./pages/teacher/StudentRiskPage";
 
 // Student pages
 import StudentDashboard from "./pages/student/StudentDashboard";
+import MyAttendance from "./pages/student/MyAttendance";
+import MyAssignments from "./pages/student/MyAssignments";
+import MyPerformance from "./pages/student/MyPerformance";
+import MyTimetable from "./pages/student/MyTimetable";
 
 // Role-based private route guard
 function PrivateRoute({ children, allowedRoles }) {
@@ -74,12 +89,12 @@ function AppRoutes() {
       >
         <Route index element={<AdminDashboard />} />
         <Route path="campus" element={<ComingSoon title="Campus View" description="Visual room-by-room campus overview with real-time status. Coming in Phase 8." />} />
-        <Route path="classes" element={<ComingSoon title="Class Management" description="Manage all classes, view classroom health details, enrollment. Coming in Phase 4." />} />
-        <Route path="classes/:id" element={<ComingSoon title="Class Detail" description="Detailed classroom analytics, student list, performance. Coming in Phase 4." />} />
-        <Route path="students" element={<ComingSoon title="Student Management" description="View and manage all students. Coming in Phase 4." />} />
-        <Route path="faculty" element={<ComingSoon title="Faculty Management" description="View and manage faculty. Coming in Phase 4." />} />
-        <Route path="timetable" element={<ComingSoon title="Timetable Management" description="Smart timetable with conflict detection. Coming in Phase 8." />} />
-        <Route path="rooms" element={<ComingSoon title="Room Management" description="Room utilization analytics and management. Coming in Phase 8." />} />
+        <Route path="classes" element={<ClassManagement />} />
+        <Route path="classes/:id" element={<ClassDetail />} />
+        <Route path="students" element={<StudentManagement />} />
+        <Route path="faculty" element={<FacultyManagement />} />
+        <Route path="timetable" element={<TimetableManagement />} />
+        <Route path="rooms" element={<RoomManagement />} />
         <Route path="analytics" element={<ComingSoon title="Institution Analytics" description="In-depth analytics across all departments. Coming in Phase 9." />} />
         <Route path="announcements" element={<ComingSoon title="Announcements" description="Manage institutional announcements. Coming in Phase 4." />} />
         <Route path="assistant" element={<AIAssistantPage />} />
@@ -95,14 +110,13 @@ function AppRoutes() {
         }
       >
         <Route index element={<TeacherDashboard />} />
-        <Route path="classes" element={<ComingSoon title="My Classes" description="Detailed class views with health score breakdown. Coming in Phase 4." />} />
-        <Route path="classes/:id" element={<ComingSoon title="Class Detail" description="Detailed analytics for specific class. Coming in Phase 4." />} />
-        <Route path="attendance" element={<ComingSoon title="Attendance Management" description="QR-based smart attendance with analytics. Coming in Phase 5." />} />
-        <Route path="assignments" element={<ComingSoon title="Assignment Management" description="Create, manage, and evaluate assignments. Coming in Phase 6." />} />
-        <Route path="risk" element={<ComingSoon title="At-Risk Students" description="Early warning system with explainable risk scores. Coming in Phase 11." />} />
-        <Route path="risk/:id" element={<ComingSoon title="Student Risk Detail" description="Detailed student risk profile and intervention recommendations. Coming in Phase 11." />} />
-        <Route path="performance" element={<ComingSoon title="Performance Analytics" description="Class performance trends and subject analytics. Coming in Phase 7." />} />
-        <Route path="timetable" element={<ComingSoon title="My Timetable" description="Personal schedule view. Coming in Phase 8." />} />
+        <Route path="classes" element={<ClassesPage />} />
+        <Route path="classes/:id" element={<ClassDetail />} />
+        <Route path="attendance" element={<AttendancePage />} />
+        <Route path="assignments" element={<AssignmentsPage />} />
+        <Route path="risk" element={<StudentRiskPage />} />
+        <Route path="performance" element={<PerformancePage />} />
+        <Route path="timetable" element={<MyTimetable />} />
         <Route path="announcements" element={<ComingSoon title="Announcements" description="Create and manage announcements. Coming in Phase 4." />} />
         <Route path="assistant" element={<AIAssistantPage />} />
       </Route>
@@ -117,10 +131,10 @@ function AppRoutes() {
         }
       >
         <Route index element={<StudentDashboard />} />
-        <Route path="attendance" element={<ComingSoon title="My Attendance" description="Detailed attendance history and trends. Coming in Phase 5." />} />
-        <Route path="assignments" element={<ComingSoon title="Assignments" description="View, submit, and track assignments. Coming in Phase 6." />} />
-        <Route path="performance" element={<ComingSoon title="My Performance" description="Subject-wise marks, trends, and recommendations. Coming in Phase 7." />} />
-        <Route path="timetable" element={<ComingSoon title="My Timetable" description="Weekly class schedule. Coming in Phase 8." />} />
+        <Route path="attendance" element={<MyAttendance />} />
+        <Route path="assignments" element={<MyAssignments />} />
+        <Route path="performance" element={<MyPerformance />} />
+        <Route path="timetable" element={<MyTimetable />} />
         <Route path="resources" element={<ComingSoon title="Study Resources" description="Notes and study materials from teachers. Coming in Phase 6." />} />
         <Route path="announcements" element={<ComingSoon title="Announcements" description="Institutional and class announcements. Coming in Phase 4." />} />
         <Route path="assistant" element={<AIAssistantPage />} />

@@ -1,6 +1,25 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+from app.database.connection import engine, SessionLocal, Base
+from app.utils.seed import seed_database
+
+# Import routers (to be created next)
+from app.api.routes import (
+    auth, classes, students, teachers, rooms,
+    timetable, attendance, assignments, performance,
+    announcements, notifications, dashboard
+)
+
+# Auto create SQLite tables
+Base.metadata.create_all(bind=engine)
+
+# Auto seed database if empty
+db = SessionLocal()
+try:
+    seed_database(db)
+finally:
+    db.close()
 
 app = FastAPI(
     title="SmartClass API",
@@ -16,6 +35,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include routers
+app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
+app.include_router(dashboard.router, prefix="/api/dashboard", tags=["Dashboard"])
+app.include_router(classes.router, prefix="/api/classes", tags=["Classes"])
+app.include_router(students.router, prefix="/api/students", tags=["Students"])
+app.include_router(teachers.router, prefix="/api/teachers", tags=["Teachers"])
+app.include_router(rooms.router, prefix="/api/rooms", tags=["Rooms"])
+app.include_router(timetable.router, prefix="/api/timetable", tags=["Timetable"])
+app.include_router(attendance.router, prefix="/api/attendance", tags=["Attendance"])
+app.include_router(assignments.router, prefix="/api/assignments", tags=["Assignments"])
+app.include_router(performance.router, prefix="/api/performance", tags=["Performance"])
+app.include_router(announcements.router, prefix="/api/announcements", tags=["Announcements"])
+app.include_router(notifications.router, prefix="/api/notifications", tags=["Notifications"])
 
 
 @app.get("/health", tags=["System"])

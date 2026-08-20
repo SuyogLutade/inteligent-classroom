@@ -1,38 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { teachers, students } from "../data/mockData";
+import { api } from "../services/api";
 
 const AuthContext = createContext(null);
-
-// Demo users for prototype
-const DEMO_USERS = {
-  admin: {
-    id: "admin-1",
-    name: "Dr. Priya Nair",
-    email: "admin@smartclass.edu",
-    password: "admin123",
-    role: "admin",
-    designation: "HOD & Administrator",
-    department: "Computer Science & Engineering",
-  },
-  ...Object.fromEntries(
-    teachers.map((t) => [
-      t.id,
-      { ...t, role: "teacher", designation: "Assistant Professor" },
-    ])
-  ),
-  ...Object.fromEntries(
-    students.map((s) => [
-      s.id,
-      { ...s, role: "student", designation: "B.Tech Student" },
-    ])
-  ),
-};
-
-// Lookup by email
-const USERS_BY_EMAIL = Object.values(DEMO_USERS).reduce((acc, user) => {
-  acc[user.email] = user;
-  return acc;
-}, {});
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -52,24 +21,21 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    // Simulate API delay
-    await new Promise((r) => setTimeout(r, 800));
-
-    const found = USERS_BY_EMAIL[email];
-    if (!found || found.password !== password) {
-      throw new Error("Invalid email or password");
+    try {
+      const data = await api.auth.login(email, password);
+      setUser(data.user);
+      localStorage.setItem("smartclass_user", JSON.stringify(data.user));
+      localStorage.setItem("smartclass_token", data.token);
+      return data.user;
+    } catch (err) {
+      throw new Error(err.response?.data?.detail || "Invalid email or password");
     }
-
-    // Don't store password in state
-    const { password: _pw, ...safeUser } = found;
-    setUser(safeUser);
-    localStorage.setItem("smartclass_user", JSON.stringify(safeUser));
-    return safeUser;
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem("smartclass_user");
+    localStorage.removeItem("smartclass_token");
   };
 
   const value = { user, login, logout, loading, isAuthenticated: !!user };

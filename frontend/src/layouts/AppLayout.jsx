@@ -127,9 +127,9 @@ export default function AppLayout() {
   );
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex sidebar flex-col w-64 z-30">
+    <div className="h-screen bg-background flex overflow-hidden">
+      {/* Desktop Sidebar — sticky, never overlaps content */}
+      <aside className="hidden lg:flex sidebar flex-col w-64 flex-shrink-0">
         <SidebarContent />
       </aside>
 
@@ -152,10 +152,10 @@ export default function AppLayout() {
         </div>
       )}
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 lg:pl-0">
+      {/* Main content — takes remaining width, scrolls independently */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Mobile top bar */}
-        <header className="lg:hidden flex items-center gap-3 px-4 py-3 border-b border-border bg-card sticky top-0 z-20">
+        <header className="lg:hidden flex items-center gap-3 px-4 py-3 border-b border-border bg-card flex-shrink-0 z-20">
           <button
             onClick={() => setSidebarOpen(true)}
             className="p-1.5 rounded-lg hover:bg-accent text-muted-foreground"
@@ -170,8 +170,8 @@ export default function AppLayout() {
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 p-6 lg:p-8 overflow-auto">
+        {/* Page content — scrollable */}
+        <main className="flex-1 overflow-y-auto p-6 lg:p-8">
           <Outlet />
         </main>
       </div>

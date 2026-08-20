@@ -6,8 +6,10 @@ import { ClassHealthCard } from "../../components/common/HealthScore";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "../../components/ui/Card";
 import { Badge } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
+import { useState, useEffect } from "react";
+import { api } from "../../services/api";
 import {
-  adminStats, classrooms, notifications, announcements, rooms, timetableSlots
+  adminStats as mockAdminStats, classrooms, notifications, announcements, rooms, timetableSlots
 } from "../../data/mockData";
 import {
   Users, GraduationCap, Building2, BarChart2, AlertTriangle,
@@ -35,9 +37,16 @@ const attendanceData = [
 export default function AdminDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [dbStats, setDbStats] = useState(null);
+
+  useEffect(() => {
+    api.dashboard.getAdminStats().then(setDbStats).catch(console.error);
+  }, []);
+
+  const adminStats = dbStats || mockAdminStats;
   const unread = notifications.admin.filter((n) => !n.read);
   const conflicts = timetableSlots.filter((s) => s.hasConflict);
-  const uniqueConflicts = Math.ceil(conflicts.length / 2);
+  const uniqueConflicts = adminStats.alerts?.timetableConflicts || Math.ceil(conflicts.length / 2);
   const underutilizedRooms = rooms.filter((r) => r.utilization < 40);
 
   return (
